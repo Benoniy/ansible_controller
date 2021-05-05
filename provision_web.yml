@@ -29,14 +29,49 @@
     apt: pkg=python-software-properties state=present
 
 
+  - name: create nodeFile
+    file:
+      state: touch
+      path: /home/ubuntu/nodeSetup.sh
+
+
   - name: add node source
     shell: 
-      cmd: curl -sL https://deb.nodesource.com/setup_6.x > nodeSetup.sh
+      cmd: sudo curl -sL https://deb.nodesource.com/setup_6.x > nodeSetup.sh
     shell:
       cmd: bash nodeSetup.sh
+    
+  - name: cleanup files
+    file:
+      state: absent
+      path: /home/ubuntu/nodeSetup.sh
+
+  
+  - name: Install nodejs
+    apt: pkg=nodejs state=present
 
 
   - name: Install pm2
     shell:
       cmd: npm install -g pm2	
   
+  - name: Install tmux
+    apt: pkg=tmux state=present
+
+  - name: Refresh git
+    file:
+      state: absent
+      path: /home/ubuntu/eng84_cicd
+  
+  - name: Redownloading from git   
+    shell:
+      cmd: git clone https://github.com/Benoniy/eng84_cicd
+
+    
+  - name: fix nginx
+    shell:
+      cmd: mv /home/ubuntu/eng84_cicd/environment/app/nginx.default /etc/nginx/sites-available/default
+  
+  - name: Enable nginx at boot
+    service: name=nginx state=restarted enabled=yes
+
