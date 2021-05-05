@@ -6,12 +6,6 @@
   become: true
 
   tasks:
-
-  - name: tmuxKill
-    shell:
-      cmd: pkill -f tmux  
-    ignore_errors: true
-
   - name: update
     shell:
       cmd: apt-get update -y
@@ -85,19 +79,3 @@
   - name: NPM install
     npm:
       path: /home/ubuntu/eng84_cicd/app
-  
-
-  - name: create tmuxFile
-    file:
-      state: touch
-      path: /home/ubuntu/eng84_cicd/app/tmuxStart.sh
-
-
-
-  - name: run tmux
-    shell: 
-      cmd: echo "sudo tmux new-session -ds app; tmux send-keys -t app 'node app.js' C-m" > tmuxStart.sh
-      chdir: /home/ubuntu/eng84_cicd/app
-    shell:
-      cmd: bash tmuxStart.sh
-      chdir: /home/ubuntu/eng84_cicd/app
