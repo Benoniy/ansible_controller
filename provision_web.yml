@@ -1,0 +1,42 @@
+
+---
+
+- hosts: web
+  gather_facts: yes
+  become: true
+
+  tasks:
+  
+  - name: update
+    shell:
+      cmd: apt-get update -y
+  
+
+  - name: upgrade
+    shell:
+      cmd: apt-get upgrade -y
+
+   
+  - name: Install Nginx
+    apt: pkg=nginx state=present
+
+
+  - name: Install npm
+    apt: pkg=npm state=present
+
+
+  - name: Install PythonSoftwareProperties
+    apt: pkg=python-software-properties state=present
+
+
+  - name: add node source
+    shell: 
+      cmd: curl -sL https://deb.nodesource.com/setup_6.x > nodeSetup.sh
+    shell:
+      cmd: bash nodeSetup.sh
+
+
+  - name: Install pm2
+    shell:
+      cmd: npm install -g pm2	
+  
