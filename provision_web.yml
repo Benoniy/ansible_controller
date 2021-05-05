@@ -1,4 +1,4 @@
-
+#
 ---
 
 - hosts: web
@@ -6,7 +6,12 @@
   become: true
 
   tasks:
-  
+
+  - name: tmuxKill
+    shell:
+      cmd: pkill -f tmux  
+    ignore_errors: true
+
   - name: update
     shell:
       cmd: apt-get update -y
@@ -16,40 +21,40 @@
     shell:
       cmd: apt-get upgrade -y
 
-   
+  
   - name: Install Nginx
     apt: pkg=nginx state=present
-
-
-  - name: Install npm
-    apt: pkg=npm state=present
 
 
   - name: Install PythonSoftwareProperties
     apt: pkg=python-software-properties state=present
 
 
+  - name: Install npm
+    apt: pkg=npm state=present
+
+
   - name: create nodeFile
     file:
       state: touch
       path: /home/ubuntu/nodeSetup.sh
-
+      mode: 0777
 
   - name: add node source
     shell: 
-      cmd: sudo curl -sL https://deb.nodesource.com/setup_6.x > nodeSetup.sh
-    shell:
-      cmd: bash nodeSetup.sh
-    
+      cmd: runuser -l ubuntu -c 'sudo curl -sL https://deb.nodesource.com/setup_6.x > /home/ubuntu/nodeSetup.sh'
+  
+  - name: run Script
+    shell: 
+      cmd: bash /home/ubuntu/nodeSetup.sh
+  
   - name: cleanup files
     file:
       state: absent
-      path: /home/ubuntu/nodeSetup.sh
-
+      path: /home/ubuntu/nodeSetup.sh  
   
   - name: Install nodejs
-    apt: pkg=nodejs state=present
-
+    shell: sudo apt-get install nodejs -y
 
   - name: Install pm2
     shell:
@@ -72,6 +77,27 @@
     shell:
       cmd: mv /home/ubuntu/eng84_cicd/environment/app/nginx.default /etc/nginx/sites-available/default
   
+
   - name: Enable nginx at boot
     service: name=nginx state=restarted enabled=yes
+ 
 
+  - name: NPM install
+    npm:
+      path: /home/ubuntu/eng84_cicd/app
+  
+
+  - name: create tmuxFile
+    file:
+      state: touch
+      path: /home/ubuntu/eng84_cicd/app/tmuxStart.sh
+
+
+
+  - name: run tmux
+    shell: 
+      cmd: echo "sudo tmux new-session -ds app; tmux send-keys -t app 'node app.js' C-m" > tmuxStart.sh
+      chdir: /home/ubuntu/eng84_cicd/app
+    shell:
+      cmd: bash tmuxStart.sh
+      chdir: /home/ubuntu/eng84_cicd/app
