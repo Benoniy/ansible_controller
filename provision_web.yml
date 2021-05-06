@@ -82,5 +82,5 @@
 
   - name: export DBHOST
     lineinfile:
-      dest: /home/ubuntu/.bashrc
+      path: /home/ubuntu/.bashrc
       line: export DB_HOST=mongodb://66.66.2.36:27017/posts
