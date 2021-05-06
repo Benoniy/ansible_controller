@@ -76,3 +76,7 @@
     lineinfile:
       path: /home/ubuntu/.bashrc
       line: export DB_HOST=mongodb://66.66.2.36:27017/posts
+      
+  - name: Reboot the instance
+        reboot:
+          msg: "Reboot initiated by Ansible"
