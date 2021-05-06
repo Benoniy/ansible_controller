@@ -45,6 +45,7 @@
           region: "{{ region }}"
           wait: true
           count: 1
+          private_ip: 66.66.1.134
           assign_public_ip: yes
           instance_tags:
             Name: eng84_ben_ansible_app
@@ -62,6 +63,7 @@
           region: "{{ region }}"
           wait: true
           count: 1
+          private_ip: 66.66.2.36
           assign_public_ip: yes
           instance_tags:
             Name: eng84_ben_ansible_db

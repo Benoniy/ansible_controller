@@ -73,4 +73,10 @@
         2. now press enter and you should be done!
     
 
-5. 
+5. Now we can run our playbooks:
+    * `create_aws_controller.yml` - used to generate a controller instance
+    * `create_aws_instances.yml` - creates instances of app and db
+    * `provision_db.yml` - Provisions the db
+    * `provision_web.yml` - Provisions the app
+    1. `ansible-playbook playbook.yml --ask-vault-pass`
+    2. `ansible-playbook playbook.yml --syntax-check` - to check for errors
