@@ -13,6 +13,7 @@
     region: eu-west-1
   
   tasks:
+    
     - name: Facts
       block:
         - name: Get instance facts
@@ -31,39 +32,21 @@
 
     - name: Provisioning an ec2
       block:
-        -
-      - name: Provision app instance(s)
+      - name: Provision controller instance(s)
         ec2:
           aws_access_key: "{{aws_access_key}}"
           aws_secret_key: "{{aws_secret_key}}"
           key_name: "{{ key_name }}"
-          id: "test_app_3636"
+          id: "test_Controller_3636"
           vpc_subnet_id: "{{ pub_subnet_id }}"
           group_id: "{{ pub_sec_group }}"
-          image: "{{ image }}"
+          image: ami-0943382e114f188e8
           instance_type: t2.micro
           region: "{{ region }}"
           wait: true
           count: 1
           assign_public_ip: yes
           instance_tags:
-            Name: eng84_ben_ansible_app
-
-      - name: Provision db
-        ec2:
-          aws_access_key: "{{aws_access_key}}"
-          aws_secret_key: "{{aws_secret_key}}"
-          key_name: "{{ key_name }}"
-          id: "test_db_3636"
-          vpc_subnet_id: "{{ priv_subnet_id }}"
-          group_id: "{{ priv_sec_group }}"
-          image: "{{ image }}"
-          instance_type: t2.micro
-          region: "{{ region }}"
-          wait: true
-          count: 1
-          assign_public_ip: yes
-          instance_tags:
-            Name: eng84_ben_ansible_db
+            Name: eng84_ben_ansible_controller
 
       tags: always
