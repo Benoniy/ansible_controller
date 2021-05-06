@@ -31,7 +31,7 @@
 
     - name: Provisioning an ec2
       block:
-        -
+      
       - name: Provision app instance(s)
         ec2:
           aws_access_key: "{{aws_access_key}}"
