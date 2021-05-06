@@ -9,24 +9,19 @@
   - name: update
     shell:
       cmd: apt-get update -y
-  
 
   - name: upgrade
     shell:
       cmd: apt-get upgrade -y
-
   
   - name: Install Nginx
     apt: pkg=nginx state=present
 
-
   - name: Install PythonSoftwareProperties
     apt: pkg=python-software-properties state=present
 
-
   - name: Install npm
     apt: pkg=npm state=present
-
 
   - name: create nodeFile
     file:
@@ -65,16 +60,13 @@
   - name: Redownloading from git   
     shell:
       cmd: git clone https://github.com/Benoniy/eng84_cicd
-
-    
+   
   - name: fix nginx
     shell:
       cmd: mv /home/ubuntu/eng84_cicd/environment/app/nginx.default /etc/nginx/sites-available/default
   
-
   - name: Enable nginx at boot
     service: name=nginx state=restarted enabled=yes
- 
 
   - name: NPM install
     npm:
