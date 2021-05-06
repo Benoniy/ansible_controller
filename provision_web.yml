@@ -80,7 +80,7 @@
     npm:
       path: /home/ubuntu/eng84_cicd/app
 
-  - name: ensure db host
+  - name: export DBHOST
     lineinfile:
-      path: /home/ubuntu/.bashrc
-      line: export DB_HOST=mongodb://db_private_ip:27017/posts
+      dest: /home/ubuntu/.bashrc
+      line: export DB_HOST=mongodb://66.66.2.36:27017/posts
