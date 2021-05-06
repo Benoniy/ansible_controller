@@ -79,9 +79,8 @@
   - name: NPM install
     npm:
       path: /home/ubuntu/eng84_cicd/app
-      
-  
+
   - name: export DBHOST
-      lineinfile:
-        dest: /home/ubuntu/.bashrc
-        line: export DB_HOST=mongodb://66.66.2.36:27017/posts
+    lineinfile:
+      dest: /home/ubuntu/.bashrc
+      line: export DB_HOST=mongodb://66.66.2.36:27017/posts

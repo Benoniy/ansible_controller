@@ -1,0 +1,12 @@
+#
+---
+
+- hosts: web
+  gather_facts: yes
+  become: true
+
+  tasks:
+  - name: seed db
+    shell:
+      cmd: nodejs seeds/seed.js
+      chdir: /home/ubuntu/eng84_cicd/app
