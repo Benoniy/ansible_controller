@@ -79,3 +79,8 @@
   - name: NPM install
     npm:
       path: /home/ubuntu/eng84_cicd/app
+
+  - name: ensure db host
+    lineinfile:
+      path: /home/ubuntu/.bashrc
+      line: export DB_HOST=mongodb://db_private_ip:27017/posts
