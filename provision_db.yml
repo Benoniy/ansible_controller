@@ -1,57 +1,107 @@
 #
 ---
 
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  become: true
+
+  vars:
+    vpc_id: vpc-0c0846c59678db270
+    priv_rt_id: rtb-0840300daa9dc36ee
+    region: eu-west-1
+    ig_id: igw-0d46e454f96019c0f
+
+  tasks:
+    - name: Expose to the internet
+      ec2_vpc_route_table:
+        aws_access_key: "{{aws_access_key}}"
+        aws_secret_key: "{{aws_secret_key}}"
+        region: "{{ region }}"
+        vpc_id: "{{ vpc_id }}"
+        purge_subnets: false
+        lookup: id
+        route_table_id: "{{ priv_rt_id }}"
+        routes:
+          - dest: 0.0.0.0/0
+            gateway_id: "{{ ig_id }}"
+
+
 - hosts: db
   gather_facts: yes
   become: true
+  
+  tasks:
+    - name: update
+      shell:
+        cmd: apt-get update -y
+
+    - name: upgrade
+      shell:
+        cmd: apt-get upgrade -y
+  
+    - name: wget
+      shell:
+        cmd: runuser -l ubuntu -c 'wget -qO - https://www.mongodb.org/static/pgp/server-3.2.asc | sudo apt-key add -'
+  
+    - name: ensure file exists
+      copy:
+        content: ""
+        dest: /etc/apt/sources.list.d/mongodb-org-3.2.list
+        force: no
+        mode: 0777
+
+    - name: mongod
+      lineinfile: 
+        path: /etc/apt/sources.list.d/mongodb-org-3.2.list
+        line: deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse
+  
+    - name: update 2
+      shell:
+        cmd: apt-get update -y
+      
+    - name: Install mongod
+      shell: 
+        cmd: sudo apt-get install -y mongodb-org=3.2.20 mongodb-org-server=3.2.20 mongodb-org-shell=3.2.20 mongodb-org-mongos=3.2.20 mongodb-org-tools=3.2.20
+  
+    - name: make dir
+      file:
+        state: directory
+        path: /data/db
+      
+    - name: Change file permission
+      file:
+        path: /var/lib/mongodb
+        owner: mongodb
+
+    - name: replace ip in mongo
+      shell:
+        cmd: sudo sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mongod.conf
+      
+    - name: Enable mondod
+      service: name=mongod state=restarted enabled=yes
+      
+
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  become: true
+
+  vars:
+    vpc_id: vpc-0c0846c59678db270
+    priv_rt_id: rtb-0840300daa9dc36ee
+    region: eu-west-1
+    ig_id: igw-0d46e454f96019c0f
 
   tasks:
-  - name: update
-    shell:
-      cmd: apt-get update -y
+    - name: Destroy Internet gateway connection
+      ec2_vpc_route_table:
+        aws_access_key: "{{aws_access_key}}"
+        aws_secret_key: "{{aws_secret_key}}"
+        region: "{{ region }}"
+        vpc_id: "{{ vpc_id }}"
+        purge_subnets: false
+        purge_routes: yes
+        lookup: id
+        route_table_id: "{{ priv_rt_id }}"
 
-  - name: upgrade
-    shell:
-      cmd: apt-get upgrade -y
-  
-  - name: wget
-    shell:
-      cmd: runuser -l ubuntu -c 'wget -qO - https://www.mongodb.org/static/pgp/server-3.2.asc | sudo apt-key add -'
-  
-  - name: ensure file exists
-    copy:
-      content: ""
-      dest: /etc/apt/sources.list.d/mongodb-org-3.2.list
-      force: no
-      mode: 0777
-
-  - name: mongod
-    lineinfile: 
-      path: /etc/apt/sources.list.d/mongodb-org-3.2.list
-      line: deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse
-  
-  - name: update 2
-    shell:
-      cmd: apt-get update -y
-      
-  - name: Install mongod
-    shell: 
-      cmd: sudo apt-get install -y mongodb-org=3.2.20 mongodb-org-server=3.2.20 mongodb-org-shell=3.2.20 mongodb-org-mongos=3.2.20 mongodb-org-tools=3.2.20
-  
-  - name: make dir
-    file:
-      state: directory
-      path: /data/db
-      
-  - name: Change file permission
-    file:
-      path: /var/lib/mongodb
-      owner: mongodb
-
-  - name: replace ip in mongo
-    shell:
-      cmd: sudo sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mongod.conf
-      
-  - name: Enable mondod
-    service: name=mongod state=restarted enabled=yes
-      
