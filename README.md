@@ -71,7 +71,7 @@
     3. Once that is done you should press `esc`, you are now in command mode.
         1. Enter `:wq`, you should see it at the bottom left.
         2. now press enter and you should be done!
-    
+
 
 5. Now we can run our playbooks:
     * `create_aws_controller.yml` - used to generate a controller instance
