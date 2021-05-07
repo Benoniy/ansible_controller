@@ -63,7 +63,7 @@
    
   - name: fix nginx
     shell:
-      cmd: mv /home/ubuntu/eng84_cicd/environment/app/nginx.default /etc/nginx/sites-available/default
+      cmd: mv /home/ubuntu/eng84_cicd/environment/app/default /etc/nginx/sites-available/default
   
   - name: Enable nginx at boot
     service: name=nginx state=restarted enabled=yes
@@ -77,6 +77,56 @@
       path: /home/ubuntu/.bashrc
       line: export DB_HOST=mongodb://66.66.2.36:27017/posts
       
-  - name: Reboot the instance
-        reboot:
-          msg: "Reboot initiated by Ansible"
+
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  become: true
+
+  vars:
+    region: eu-west-1
+
+  tasks:
+    - name: Facts
+      block:
+
+        - name: get instance
+          ec2_instance_facts:
+            aws_access_key: "{{aws_access_key}}"
+            aws_secret_key: "{{aws_secret_key}}"
+            region: "{{ region }}"
+            filters:
+              private-ip-address: 66.66.1.134
+          register: instance_info
+
+      tags: always
+
+    - name: stop ec2
+      ec2:
+        aws_access_key: "{{aws_access_key}}"
+        aws_secret_key: "{{aws_secret_key}}"
+        region: "{{ region }}"
+        instance_ids: "{{instance_info.instances[0].instance_id}}"
+        state: stopped
+        wait: yes
+
+    - name: start
+      ec2:
+        aws_access_key: "{{aws_access_key}}"
+        aws_secret_key: "{{aws_secret_key}}"
+        instance_ids: "{{instance_info.instances[0].instance_id}}"
+        region: "{{ region }}"
+        state: running
+        wait: yes
+
+
+- hosts: web
+  gather_facts: yes
+  become: true
+
+  tasks:
+  - name: seed
+    shell:
+      cmd: nodejs seeds/seed.js
+      chdir: /home/ubuntu/eng84_cicd/app
+

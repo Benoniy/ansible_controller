@@ -37,7 +37,6 @@
           aws_access_key: "{{aws_access_key}}"
           aws_secret_key: "{{aws_secret_key}}"
           key_name: "{{ key_name }}"
-          id: "test_Controller_3636"
           vpc_subnet_id: "{{ pub_subnet_id }}"
           group_id: "{{ pub_sec_group }}"
           image: ami-0943382e114f188e8

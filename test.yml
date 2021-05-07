@@ -1,0 +1,54 @@
+---
+
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  become: true
+
+  vars:
+    region: eu-west-1
+    pub_subnet: subnet-0b96bde6482352562     
+
+  tasks:
+    - name: Facts
+      block:
+        - name: Get instance facts
+          ec2_instance_facts:
+            aws_access_key: "{{aws_access_key}}"
+            aws_secret_key: "{{aws_secret_key}}"
+            region: "{{ region }}"
+          register: result
+
+        - name: get instance 
+          ec2_instance_facts:
+            aws_access_key: "{{aws_access_key}}"
+            aws_secret_key: "{{aws_secret_key}}"
+            region: "{{ region }}"
+            filters:  
+              private-ip-address: 66.66.1.134
+          register: instance_info
+        
+      tags: always
+      
+    - name: debug
+      debug:
+        msg: "{{instance_info.instances[0].instance_id}}"
+
+    - name: stop ec2
+      ec2:
+        aws_access_key: "{{aws_access_key}}"
+        aws_secret_key: "{{aws_secret_key}}"
+        region: "{{ region }}"
+        instance_ids: "{{instance_info.instances[0].instance_id}}" 
+        state: stopped
+        wait: yes
+
+    - name: start
+      ec2:
+        aws_access_key: "{{aws_access_key}}"
+        aws_secret_key: "{{aws_secret_key}}"
+        instance_ids: "{{instance_info.instances[0].instance_id}}"
+        region: "{{ region }}"
+        state: running
+        wait: yes
+
