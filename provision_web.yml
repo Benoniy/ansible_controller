@@ -76,6 +76,18 @@
     lineinfile:
       path: /home/ubuntu/.bashrc
       line: export DB_HOST=mongodb://66.66.2.36:27017/posts
+
+  - name: create service file
+    shell:
+      cmd: mv /home/ubuntu/eng84_cicd/environment/app/webapp.service /etc/systemd/system/webapp.service
+
+  - name: reload daemon
+    shell:
+      cmd: systemctl daemon-reload
+
+  - name: Enable webapp
+    service: name=webapp state=started enabled=yes
+
       
 
 - hosts: localhost
@@ -118,6 +130,10 @@
         region: "{{ region }}"
         state: running
         wait: yes
+    
+    - name: wait for stability
+      pause:
+        seconds: 20
 
 
 - hosts: web
